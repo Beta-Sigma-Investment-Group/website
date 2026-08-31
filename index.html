@@ -438,6 +438,7 @@ p { text-wrap: pretty; }
   padding-bottom: 20px;
   border-bottom: 1px solid var(--border);
 }
+.section-head > :only-child { grid-column: 1 / -1; }
 .section-head .lede {
   font-size: 18px;
   color: var(--muted);
@@ -446,7 +447,7 @@ p { text-wrap: pretty; }
 }
 @media (max-width: 820px) {
   .section-head { grid-template-columns: 1fr; gap: 24px; }
-  section { padding: 80px 0; }
+  section { padding: 56px 0; }
 }
 
 /* ============================================================
@@ -656,49 +657,6 @@ p { text-wrap: pretty; }
 }
 
 /* ============================================================
-   Ticker
-   ============================================================ */
-.ticker {
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-  background: var(--ink);
-  color: #EBE6DC;
-  overflow: hidden;
-  position: relative;
-}
-.ticker-rail {
-  display: flex;
-  gap: 40px;
-  padding: 16px 0;
-  white-space: nowrap;
-  animation: ticker-scroll 90s linear infinite;
-  will-change: transform;
-}
-.ticker:hover .ticker-rail { animation-play-state: paused; }
-@keyframes ticker-scroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
-}
-.ticker-item {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 10px;
-  font-family: var(--mono);
-  font-size: 13px;
-  letter-spacing: 0.04em;
-}
-.ticker-item .sym { color: #FAF7F2; font-weight: 600; }
-.ticker-item .px { color: #C8C0B0; }
-.ticker-item .chg { font-weight: 500; }
-.ticker-item .chg.up { color: #6FCF97; }
-.ticker-item .chg.dn { color: #EB7B85; }
-.ticker-item .dot {
-  width: 4px; height: 4px; border-radius: 50%;
-  background: var(--red); display: inline-block;
-  transform: translateY(-2px);
-}
-
-/* ============================================================
    Fund performance
    ============================================================ */
 .fund-grid {
@@ -766,12 +724,6 @@ p { text-wrap: pretty; }
   letter-spacing: 0.04em;
 }
 
-.spark {
-  width: 100%;
-  height: 80px;
-  display: block;
-}
-
 .fund-meta {
   display: flex;
   justify-content: space-between;
@@ -830,20 +782,6 @@ p { text-wrap: pretty; }
   text-transform: uppercase;
   color: var(--muted-2);
 }
-.holdings-table .bar-wrap {
-  width: 100%;
-  height: 4px;
-  background: rgba(0,0,0,0.06);
-  position: relative;
-  margin-top: 8px;
-}
-.holdings-table .bar {
-  position: absolute;
-  inset: 0 auto 0 0;
-  background: var(--red);
-  transition: width 1.2s cubic-bezier(.22,.61,.36,1);
-}
-
 .holdings-foot {
   margin-top: 24px;
   font-size: 12px;
@@ -917,15 +855,17 @@ p { text-wrap: pretty; }
 }
 .board-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  gap: clamp(18px, 2vw, 28px);
 }
-@media (max-width: 1000px) { .board-grid { grid-template-columns: repeat(4, 1fr); } }
-@media (max-width: 560px) { .board-grid { grid-template-columns: repeat(3, 1fr); } }
+.alumni-grid { grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); }
 
 .board-card {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  transform-origin: center 40%;
+  transition: transform .25s cubic-bezier(.22,.61,.36,1);
 }
 .board-photo {
   aspect-ratio: 4 / 5;
@@ -942,6 +882,7 @@ p { text-wrap: pretty; }
   height: 100%;
   object-fit: cover;
   object-position: center 18%;
+  transition: transform .3s cubic-bezier(.22,.61,.36,1);
 }
 .board-photo img.zoom-in {
   transform: scale(2.1) translateY(-12%);
@@ -960,16 +901,31 @@ p { text-wrap: pretty; }
 }
 .board-name {
   font-family: var(--serif);
-  font-size: 14px;
-  line-height: 1.15;
+  font-size: 16px;
+  line-height: 1.2;
   margin: 0 0 2px;
+  transition: color .2s ease, transform .25s cubic-bezier(.22,.61,.36,1);
 }
 .board-role {
-  font-size: 9px;
-  letter-spacing: 0.12em;
+  font-size: 10px;
+  line-height: 1.35;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--red);
   margin-bottom: 4px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .board-card.reveal.in:hover {
+    transform: translateY(-3px) scale(1.02);
+    z-index: 2;
+  }
+  .board-card:hover .board-photo img { transform: scale(1.045); }
+  .board-card:hover .board-photo img.zoom-in { transform: scale(2.19) translateY(-12%); }
+  .board-card:hover .board-name {
+    color: var(--red-dark);
+    transform: translateY(1px) scale(1.015);
+    transform-origin: left center;
+  }
 }
 .board-bio {
   font-size: 13px;
@@ -1081,6 +1037,10 @@ p { text-wrap: pretty; }
   background: var(--bg-alt);
   padding: 60px 0;
 }
+.philanthropy .section-head {
+  grid-template-columns: minmax(max-content, .95fr) 1.05fr;
+}
+.philanthropy .section-head h2 { white-space: nowrap; }
 .phil-inner {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -1090,8 +1050,11 @@ p { text-wrap: pretty; }
 .phil-mark {
   background: var(--bg-elev);
   border: 1px solid var(--border);
-  padding: 28px 32px;
-  text-align: center;
+  padding: 24px 28px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 28px;
 }
 .phil-mark .num {
   font-family: var(--serif);
@@ -1115,6 +1078,11 @@ p { text-wrap: pretty; }
   font-family: var(--serif);
   font-size: 15px;
 }
+.phil-mark img {
+  height: 72px;
+  width: auto;
+  flex-shrink: 0;
+}
 .phil-body p {
   font-size: 15px;
   line-height: 1.65;
@@ -1123,6 +1091,10 @@ p { text-wrap: pretty; }
 }
 @media (max-width: 880px) {
   .phil-inner { grid-template-columns: 1fr; gap: 32px; }
+}
+@media (max-width: 820px) {
+  .philanthropy .section-head { grid-template-columns: 1fr; }
+  .philanthropy .section-head h2 { font-size: clamp(24px, 7vw, 40px); }
 }
 
 /* ============================================================
@@ -1280,9 +1252,37 @@ p { text-wrap: pretty; }
   font-size: 13px;
   color: var(--red);
   margin-top: 6px;
+  overflow-wrap: anywhere;
+}
+.contact-people {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
 }
 @media (max-width: 880px) {
   .contact-inner { grid-template-columns: 1fr; gap: 32px; }
+}
+
+@media (max-width: 600px) {
+  :root { --gutter: 20px; }
+  section { padding: 48px 0; }
+  .hero { padding-inline: var(--gutter); }
+  .fund-card { padding: 28px 24px; gap: 22px; }
+  .fund-perf { gap: 16px; }
+  .fund-perf .perf-value { font-size: 30px; }
+  .about-pillars { grid-template-columns: 1fr; }
+  .board-grid,
+  .alumni-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .holdings-table { min-width: 680px; }
+  .placements-totals { grid-template-columns: 1fr; gap: 20px; }
+  .phil-mark {
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .phil-mark .partner { font-size: 13px; }
+  .contact-people { grid-template-columns: 1fr; }
+  .footer-top { grid-template-columns: 1fr; gap: 32px; }
 }
 
 /* ============================================================
@@ -1356,6 +1356,7 @@ p { text-wrap: pretty; }
    ============================================================ */
 .reveal { opacity: 0; transform: translateY(20px); transition: opacity .9s ease, transform .9s cubic-bezier(.22,.61,.36,1); }
 .reveal.in { opacity: 1; transform: none; }
+.board-card.reveal { transition: opacity .9s ease, transform .25s cubic-bezier(.22,.61,.36,1); }
 
 /* Numeric tabular alignment helper */
 .tabular { font-variant-numeric: tabular-nums; }
@@ -1585,18 +1586,15 @@ p { text-wrap: pretty; }
 </section>
 
 <!-- ============================ FUNDS ============================ -->
-<section id="funds" style="padding-top:0;">
-  <div class="ticker" aria-label="Live holdings ticker">
-    <div class="ticker-rail" id="tickerRail"></div>
-  </div>
-  <div class="container" style="padding-top:32px;">
+<section id="funds">
+  <div class="container">
     <header class="section-head">
       <div>
         <span class="eyebrow">Funds</span>
         <h2>Two funds. <em style="font-style:italic;color:var(--red);">Outperforming the benchmark.</em></h2>
       </div>
       <p class="lede">
-        Year‑to‑date returns, reported alongside the S&amp;P 500.
+        Performance snapshot as of March 2026, reported alongside the S&amp;P 500.
       </p>
     </header>
 
@@ -1624,18 +1622,6 @@ p { text-wrap: pretty; }
             <div class="perf-sub">Above benchmark</div>
           </div>
         </div>
-
-        <svg class="spark" viewBox="0 0 400 80" preserveAspectRatio="none" aria-hidden="true">
-          <defs>
-            <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" stop-color="#A63232" stop-opacity="0.18"></stop>
-              <stop offset="100%" stop-color="#A63232" stop-opacity="0"></stop>
-            </linearGradient>
-          </defs>
-          <path d="M0,35 L40,38 L80,30 L120,42 L160,48 L200,50 L240,44 L280,52 L320,55 L360,50 L400,58" stroke="#A63232" stroke-width="1.5" fill="none"></path>
-          <path d="M0,35 L40,38 L80,30 L120,42 L160,48 L200,50 L240,44 L280,52 L320,55 L360,50 L400,58 L400,80 L0,80 Z" fill="url(#g1)"></path>
-          <path d="M0,38 L40,42 L80,46 L120,50 L160,54 L200,58 L240,62 L280,65 L320,68 L360,71 L400,74" stroke="#948B7E" stroke-width="1" stroke-dasharray="2 3" fill="none"></path>
-        </svg>
 
         <div class="fund-meta">
           <span>22 positions</span>
@@ -1666,18 +1652,6 @@ p { text-wrap: pretty; }
           </div>
         </div>
 
-        <svg class="spark" viewBox="0 0 400 80" preserveAspectRatio="none" aria-hidden="true">
-          <defs>
-            <linearGradient id="g2" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" stop-color="#1F6B3F" stop-opacity="0.18"></stop>
-              <stop offset="100%" stop-color="#1F6B3F" stop-opacity="0"></stop>
-            </linearGradient>
-          </defs>
-          <path d="M0,52 L40,50 L80,58 L120,55 L160,48 L200,46 L240,40 L280,44 L320,36 L360,30 L400,28" stroke="#1F6B3F" stroke-width="1.5" fill="none"></path>
-          <path d="M0,52 L40,50 L80,58 L120,55 L160,48 L200,46 L240,40 L280,44 L320,36 L360,30 L400,28 L400,80 L0,80 Z" fill="url(#g2)"></path>
-          <path d="M0,50 L40,53 L80,57 L120,60 L160,62 L200,64 L240,66 L280,68 L320,70 L360,72 L400,74" stroke="#948B7E" stroke-width="1" stroke-dasharray="2 3" fill="none"></path>
-        </svg>
-
         <div class="fund-meta">
           <span>ETF + equity blend</span>
           <span><b>Top holding:</b> CLS +285%</span>
@@ -1686,10 +1660,10 @@ p { text-wrap: pretty; }
 
     </div>
 
-    <div style="margin-top:40px;padding-top:28px;border-top:1px solid var(--border);">
+    <div id="holdings" style="margin-top:40px;padding-top:28px;border-top:1px solid var(--border);">
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
-        <h3 style="font-family:var(--serif);font-size:24px;">Top holdings, <em style="font-style:italic;color:var(--red);">currently held.</em></h3>
-        <span style="font-size:13px;color:var(--muted);">Top 5 by gain. Full portfolio available to alumni on request.</span>
+        <h3 style="font-family:var(--serif);font-size:24px;">Top holdings, <em style="font-style:italic;color:var(--red);">as reported.</em></h3>
+        <span style="font-size:13px;color:var(--muted);">Top 5 by gain as of March 2026. Full portfolio available to alumni on request.</span>
       </div>
 
     <div style="overflow-x:auto;">
@@ -1704,11 +1678,11 @@ p { text-wrap: pretty; }
         </tr>
       </thead>
       <tbody id="holdingsBody">
-        <tr><td>01</td><td class="col-name">Apple Inc.</td><td class="col-ticker">AAPL</td><td class="col-fund">Fund I</td><td class="col-gain" data-gain="520">+520.01%<div class="bar-wrap"><div class="bar" data-pct="100"></div></div></td></tr>
-        <tr><td>02</td><td class="col-name">Meta Platforms</td><td class="col-ticker">META</td><td class="col-fund">Fund I</td><td class="col-gain" data-gain="405">+405.77%<div class="bar-wrap"><div class="bar" data-pct="78"></div></div></td></tr>
-        <tr><td>03</td><td class="col-name">Celestica Inc.</td><td class="col-ticker">CLS</td><td class="col-fund">Fund II</td><td class="col-gain" data-gain="285">+285.01%<div class="bar-wrap"><div class="bar" data-pct="55"></div></div></td></tr>
-        <tr><td>04</td><td class="col-name">S&amp;P Global</td><td class="col-ticker">SPGI</td><td class="col-fund">Fund I</td><td class="col-gain" data-gain="244">+244.85%<div class="bar-wrap"><div class="bar" data-pct="47"></div></div></td></tr>
-        <tr><td>05</td><td class="col-name">JPMorgan Chase</td><td class="col-ticker">JPM</td><td class="col-fund">Fund I</td><td class="col-gain" data-gain="243">+243.17%<div class="bar-wrap"><div class="bar" data-pct="47"></div></div></td></tr>
+        <tr><td>01</td><td class="col-name">Apple Inc.</td><td class="col-ticker">AAPL</td><td class="col-fund">Fund I</td><td class="col-gain" data-gain="520">+520.01%</td></tr>
+        <tr><td>02</td><td class="col-name">Meta Platforms</td><td class="col-ticker">META</td><td class="col-fund">Fund I</td><td class="col-gain" data-gain="405">+405.77%</td></tr>
+        <tr><td>03</td><td class="col-name">Celestica Inc.</td><td class="col-ticker">CLS</td><td class="col-fund">Fund II</td><td class="col-gain" data-gain="285">+285.01%</td></tr>
+        <tr><td>04</td><td class="col-name">S&amp;P Global</td><td class="col-ticker">SPGI</td><td class="col-fund">Fund I</td><td class="col-gain" data-gain="244">+244.85%</td></tr>
+        <tr><td>05</td><td class="col-name">JPMorgan Chase</td><td class="col-ticker">JPM</td><td class="col-fund">Fund I</td><td class="col-gain" data-gain="243">+243.17%</td></tr>
       </tbody>
     </table>
     </div>
@@ -1721,7 +1695,7 @@ p { text-wrap: pretty; }
 </section>
 
 <!-- ============================ BOARD ============================ -->
-<section id="board" class="board" style="padding: 56px 0;">
+<section id="board" class="board">
   <div class="container">
     <header class="section-head">
       <div>
@@ -1794,7 +1768,7 @@ p { text-wrap: pretty; }
 
     <div style="margin-top:40px;padding-top:28px;border-top:1px solid var(--border);">
       <h3 style="font-family:var(--serif);font-size:22px;margin-bottom:20px;">Alumni Board</h3>
-      <div class="board-grid" style="grid-template-columns:repeat(8,1fr);">
+      <div class="board-grid alumni-grid">
         <div class="board-card">
           <div class="board-photo"><img src="assets/images/alumni-arjun-dundoo.jpg" alt="Arjun Dundoo"></div>
           <h3 class="board-name">Arjun Dundoo</h3>
@@ -1803,7 +1777,7 @@ p { text-wrap: pretty; }
         <div class="board-card">
           <div class="board-photo"><img src="assets/images/alumni-gregoire-marsot.jpg" alt="Gregoire Marsot"></div>
           <h3 class="board-name">Gregoire Marsot</h3>
-          <div class="board-role" style="color:var(--muted);">Citi</div>
+          <div class="board-role" style="color:var(--muted);">Founder</div>
         </div>
         <div class="board-card">
           <div class="board-photo"><img src="assets/images/alumni-sam-frazer.jpg" alt="Sam Frazer"></div>
@@ -2013,7 +1987,7 @@ p { text-wrap: pretty; }
 </section>
 
 <!-- ============================ PHILANTHROPY ============================ -->
-<section class="philanthropy" style="padding:40px 0;">
+<section class="philanthropy">
   <div class="container">
     <header class="section-head" style="margin-bottom:20px;">
       <div>
@@ -2026,13 +2000,13 @@ p { text-wrap: pretty; }
     </header>
 
     <div class="phil-inner" style="gap:32px;">
-      <div class="phil-mark" style="padding:24px 28px;display:flex;align-items:center;gap:28px;text-align:left;">
+      <div class="phil-mark">
         <div>
-          <span class="num tabular" style="font-size:clamp(40px,5vw,64px);">$40K+</span>
+          <span class="num tabular">$40K+</span>
           <div class="sub" style="margin-top:8px;">Contributed since founding</div>
           <div class="partner" style="margin-top:10px;padding-top:10px;">St. Jude Children's Research Hospital</div>
         </div>
-        <img src="assets/images/bsig-icon.png" alt="BSIG" style="height:72px;width:auto;flex-shrink:0;">
+        <img src="assets/images/bsig-icon.png" alt="BSIG">
       </div>
       <div class="phil-body">
         <p>
@@ -2044,7 +2018,7 @@ p { text-wrap: pretty; }
 </section>
 
 <!-- ============================ NEWSLETTER ARCHIVE ============================ -->
-<section id="archive" style="padding: 48px 0;">
+<section id="archive">
   <div class="container">
     <header class="section-head">
       <div>
@@ -2238,7 +2212,7 @@ p { text-wrap: pretty; }
     <div class="contact-card">
       <div>
         <h4>Co‑Presidents</h4>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+        <div class="contact-people">
           <div class="contact-person">
             <span class="name">Cameron Ward</span>
             <span class="role">Co‑President</span>
@@ -2309,56 +2283,6 @@ p { text-wrap: pretty; }
 
 <script>
 /* ============================================================
-   Ticker — simulated live feed
-   (Schwab API integration requires a server-side proxy;
-    swap fetchTickers() with a real call when the backend is in place.)
-   ============================================================ */
-const TICKER_DATA = [
-  { sym: "AAPL",  px: 232.41, chg: +1.24 },
-  { sym: "META",  px: 612.18, chg: +0.81 },
-  { sym: "CLS",   px:  98.42, chg: +2.17 },
-  { sym: "SPGI",  px: 524.05, chg: +0.42 },
-  { sym: "JPM",   px: 246.71, chg: -0.18 },
-  { sym: "COST",  px: 904.23, chg: +0.55 },
-  { sym: "GOOGL", px: 196.34, chg: +1.05 },
-  { sym: "KKR",   px: 152.18, chg: -0.30 },
-  { sym: "INTC",  px:  24.31, chg: +0.71 },
-  { sym: "AA",    px:  38.92, chg: +1.42 },
-  { sym: "BLBD",  px:  49.18, chg: -0.65 },
-  { sym: "QQQ",   px: 524.40, chg: +0.31 },
-  { sym: "SPY",   px: 581.20, chg: +0.18 },
-  { sym: "SPX",   px: 5784.2, chg: -0.42, label: "S&P 500" },
-];
-
-function renderTicker() {
-  const rail = document.getElementById("tickerRail");
-  if (!rail) return;
-  const html = TICKER_DATA.map(t => {
-    const dir = t.chg >= 0 ? "up" : "dn";
-    const sign = t.chg >= 0 ? "+" : "";
-    return `<span class="ticker-item">
-      <span class="dot"></span>
-      <span class="sym">${t.label || t.sym}</span>
-      <span class="px">${t.px.toFixed(2)}</span>
-      <span class="chg ${dir}">${sign}${t.chg.toFixed(2)}%</span>
-    </span>`;
-  }).join("");
-  // Duplicate for seamless loop
-  rail.innerHTML = html + html;
-}
-renderTicker();
-
-// Simulate small price drifts so the ticker feels alive
-setInterval(() => {
-  TICKER_DATA.forEach(t => {
-    const drift = (Math.random() - 0.5) * 0.08;
-    t.px = +(t.px * (1 + drift / 100)).toFixed(2);
-    t.chg = +(t.chg + (Math.random() - 0.5) * 0.05).toFixed(2);
-  });
-  renderTicker();
-}, 4500);
-
-/* ============================================================
    Nav scroll state
    ============================================================ */
 const nav = document.getElementById("nav");
@@ -2386,20 +2310,6 @@ document.querySelectorAll("section .container > *, .board-card, .fund-card, .inv
     el.style.transitionDelay = (Math.min(i % 6, 5) * 40) + "ms";
     io.observe(el);
   });
-
-/* ============================================================
-   Animate holdings bars on reveal
-   ============================================================ */
-const barObserver = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (!e.isIntersecting) return;
-    const bar = e.target;
-    const pct = bar.dataset.pct || 0;
-    requestAnimationFrame(() => { bar.style.width = pct + "%"; });
-    barObserver.unobserve(bar);
-  });
-}, { threshold: 0.2 });
-document.querySelectorAll(".bar").forEach(b => { b.style.width = "0%"; barObserver.observe(b); });
 
 /* ============================================================
    Smooth-scroll for anchor links
